@@ -2,33 +2,131 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
-    <loc>http://xujqiao.github.io/about/index.html</loc>
-    <lastmod>2017-11-26T02:32:47.886Z</lastmod>
+    <loc>https://xujqiao.github.io/2015/11/30/2015-11-30-How-is-this-Blog-Set-Up/</loc>
+    
+    <lastmod>2026-05-26</lastmod>
+    
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
   </url>
   
   <url>
-    <loc>http://xujqiao.github.io/2015/11/30/how-is-this-set-up/</loc>
-    <lastmod>2015-11-30T15:30:10.774Z</lastmod>
+    <loc>https://xujqiao.github.io/about/index.html</loc>
+    
+    <lastmod>2026-05-26</lastmod>
+    
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
   </url>
   
   <url>
-    <loc>http://xujqiao.github.io/404.html</loc>
-    <lastmod>2015-11-28T12:58:46.359Z</lastmod>
+    <loc>https://xujqiao.github.io/2015/11/24/2015-11-24-Rescue-to-Grub-Not-Found/</loc>
+    
+    <lastmod>2026-05-26</lastmod>
+    
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
   </url>
   
   <url>
-    <loc>http://xujqiao.github.io/2015/11/24/grub-rescue/</loc>
-    <lastmod>2015-11-25T14:57:56.895Z</lastmod>
+    <loc>https://xujqiao.github.io/2026/05/18/%E3%80%8A%E9%99%8C%E7%94%9F%E4%BA%BA%E7%9A%84%E6%97%A5%E8%AE%B0%E3%80%8B%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/</loc>
+    
+    <lastmod>2026-05-25</lastmod>
+    
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
   </url>
   
   <url>
-    <loc>http://xujqiao.github.io/categories/index.html</loc>
-    <lastmod>2015-11-25T14:17:15.759Z</lastmod>
+    <loc>https://xujqiao.github.io/categories/index.html</loc>
+    
+    <lastmod>2026-05-25</lastmod>
+    
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
   </url>
   
   <url>
-    <loc>http://xujqiao.github.io/tags/index.html</loc>
-    <lastmod>2015-11-25T14:17:13.190Z</lastmod>
+    <loc>https://xujqiao.github.io/tags/index.html</loc>
+    
+    <lastmod>2026-05-25</lastmod>
+    
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+
+  <url>
+    <loc>https://xujqiao.github.io/</loc>
+    <lastmod>2026-05-26</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+  </url>
+
+  
+  <url>
+    <loc>https://xujqiao.github.io/tags/blog/</loc>
+    <lastmod>2026-05-26</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
+  <url>
+    <loc>https://xujqiao.github.io/tags/computer/</loc>
+    <lastmod>2026-05-26</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
+  <url>
+    <loc>https://xujqiao.github.io/tags/grub/</loc>
+    <lastmod>2026-05-26</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
+  <url>
+    <loc>https://xujqiao.github.io/tags/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/</loc>
+    <lastmod>2026-05-26</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
+  <url>
+    <loc>https://xujqiao.github.io/tags/%E6%8E%A8%E7%90%86/</loc>
+    <lastmod>2026-05-26</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
+  <url>
+    <loc>https://xujqiao.github.io/tags/%E5%93%A5%E7%89%B9%E6%96%87%E5%AD%A6/</loc>
+    <lastmod>2026-05-26</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
+
+  
+  <url>
+    <loc>https://xujqiao.github.io/categories/Tells-you-how-to-do/</loc>
+    <lastmod>2026-05-26</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
+  <url>
+    <loc>https://xujqiao.github.io/categories/Notes/</loc>
+    <lastmod>2026-05-26</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
+  <url>
+    <loc>https://xujqiao.github.io/categories/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/</loc>
+    <lastmod>2026-05-26</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
   </url>
   
 </urlset>

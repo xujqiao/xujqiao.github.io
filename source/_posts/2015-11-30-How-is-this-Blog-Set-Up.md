@@ -130,3 +130,154 @@ git push -u origin master         #上传
 - [使用GitHub和Hexo搭建免费静态Blog](http://wsgzao.github.io/post/hexo-guide/)
 - [hexo你的博客](http://ibruce.info/2013/11/22/hexo-your-blog/)
 - [Hexo性感的主题-NexT](http://theme-next.iissnan.com/)
+
+---
+
+# 2026年5月29日 更新：迁移到 GitHub Actions 自动部署
+
+原来的部署方式是手动 `hexo generate` 后把 `public/` 目录推送到 GitHub，每次写文章都要重复这个流程。而且远程仓库只存了构建产物（HTML/CSS/JS），源码没有版本管理，换电脑就没了。这次迁移把源码和自动部署都解决了。
+
+## 新的仓库结构
+
+之前仓库里只有 `public/` 的构建产物，现在改成**存源码**，让 GitHub Actions 自动构建部署：
+
+```
+blog/
+├── _config.yml              # 主配置
+├── package.json             # 依赖声明
+├── package-lock.json        # 依赖锁定
+├── .gitignore               # 排除 node_modules/、public/ 等
+├── .github/
+│   └── workflows/
+│       └── deploy.yml        # Actions 自动构建配置
+├── scaffolds/               # 文章模板
+├── source/                  # 文章和页面
+│   ├── _posts/              # .md 文章 + 资产文件夹
+│   ├── about/
+│   ├── tags/
+│   └── categories/
+└── themes/
+    └── next/                # NexT 主题
+```
+
+**不需要上传的**（`.gitignore` 自动排除）：`node_modules/`、`public/`、`db.json`、`.deploy_git/`
+
+## GitHub Actions 工作流
+
+在 `.github/workflows/deploy.yml` 中配置自动构建：
+
+```yaml
+name: Deploy Hexo to GitHub Pages
+
+on:
+  push:
+    branches:
+      - master
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Generate static files
+        run: npx hexo clean && npx hexo generate
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./public
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+```
+
+原理很简单：GitHub 提供一台 Linux 服务器，帮你执行 `npm install` → `hexo generate` → 部署，跟在本地终端操作一模一样。构建进度在仓库的 **Actions** 页面可以实时查看。
+
+## 配置步骤
+
+1. **GitHub Pages 设置**：进入仓库 Settings → Pages，Source 改为 **GitHub Actions**（不再是 Deploy from a branch）
+
+2. **推送源码**：把整个 `blog/` 目录推送到 `master` 分支
+
+3. **以后写文章**：
+
+```bash
+hexo new post "文章标题"
+# 编辑文章...
+git add -A
+git commit -m "新文章"
+git push origin master
+```
+
+推送后 Actions 自动构建部署，1-2 分钟后网站更新。
+
+## 踩坑记录
+
+### themes/next 的 submodule 陷阱
+
+NexT 主题是通过 `git clone` 安装的，目录下自带 `.git`，导致 git 把它当 submodule 处理——推送到远程后只有一个指针，没有实际文件。Actions 构建时找不到主题，页面白屏。
+
+**解决方法**：删掉主题目录下的 `.git`，重新 `git add`：
+
+```bash
+rm -rf themes/next/.git
+git rm --cached themes/next
+git add themes/next/
+```
+
+### hexo deploy 不会删除远程旧文件
+
+`hexo deploy` 是增量推送，不会删除 `.deploy_git/` 里远程已有的多余文件（比如旧站的 `vendors/`）。如果需要完全覆盖远程仓库，直接把 `public/` 初始化为新的 git 仓库并强制推送：
+
+```bash
+cd public
+git init
+git add -A
+git commit -m "Rebuild"
+git push -f origin HEAD:master
+```
+
+### 封面图在首页不显示
+
+文章中引用图片用相对路径 `src="cover.jpg"`，文章页没问题，但首页 URL 是根路径 `/`，浏览器会把图片解析成 `/cover.jpg` → 404。
+
+**解决方法**：用 Hexo 的 `asset_path` 标签生成绝对路径：
+
+```html
+<img src="{% asset_path cover.jpg %}" />
+```
+
+### 首页全文显示，没有"阅读全文"按钮
+
+Hexo 需要在文章中插入 `<!-- more -->` 分隔符，首页才会截断显示并出现"阅读全文"按钮。

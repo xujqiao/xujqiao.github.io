@@ -3,7 +3,7 @@ name: Deploy Hexo to GitHub Pages
 on:
   push:
     branches:
-      - source
+      - master
 
 permissions:
   contents: read
@@ -20,8 +20,6 @@ jobs:
     steps:
       - name: Checkout source
         uses: actions/checkout@v4
-        with:
-          ref: source
 
       - name: Setup Node
         uses: actions/setup-node@v4

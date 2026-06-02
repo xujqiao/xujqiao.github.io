@@ -16,6 +16,15 @@ reminder: false
 cache:
   enable: true
 
+# SEO settings
+seo: true
+
+# Nofollow external links
+nofollow:
+  enable: true
+  field: site
+  exclude:
+
 # Remove unnecessary files after hexo generate.
 minify: false
 

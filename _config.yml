@@ -5,8 +5,8 @@
 # Site
 title: Camxu
 subtitle: '看山是山，看水是水'
-description: ''
-keywords:
+description: '个人博客，记录生活与思考'
+keywords: 博客,技术,读书笔记
 author: Cam Xu
 language: zh-CN
 timezone: 'Asia/Shanghai'
@@ -104,3 +104,8 @@ deploy:
   type: git
   repository: https://github.com/xujqiao/xujqiao.github.io.git
   branch: main
+
+# Sitemap
+sitemap:
+  path: sitemap.xml
+  template: ./sitemap.xml

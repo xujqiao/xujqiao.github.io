@@ -31,7 +31,7 @@ jobs:
         run: npm install
 
       - name: Inject Gitalk Secret
-        run: sed -i "s/__GITALK_SECRET__/${{ secrets.GITALK_SECRET }}/" themes/next/_config.yml
+        run: sed -i "s/__GITALK_SECRET__/${{ secrets.__GITALK_SECRET__ }}/" themes/next/_config.yml
 
       - name: Generate static files
         run: npx hexo clean && npx hexo generate

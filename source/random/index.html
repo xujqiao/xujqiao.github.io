@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>随机数生成器</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: #0f0f23;
+      color: #e0e0e0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    /* 粒子背景 */
+    #particles {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .container {
+      position: relative;
+      z-index: 1;
+      text-align: center;
+      padding: 2rem;
+    }
+
+    .title {
+      font-size: 1.2rem;
+      color: #8888aa;
+      margin-bottom: 2rem;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+    }
+
+    .number-display {
+      font-size: 8rem;
+      font-weight: 800;
+      line-height: 1;
+      margin-bottom: 0.5rem;
+      transition: color 0.3s ease;
+      font-variant-numeric: tabular-nums;
+      text-shadow: 0 0 40px currentColor;
+      opacity: 0.9;
+    }
+
+    .number-display.small {
+      font-size: 4rem;
+    }
+
+    .label {
+      font-size: 0.85rem;
+      color: #666688;
+      margin-bottom: 2.5rem;
+    }
+
+    .controls {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      margin-bottom: 3rem;
+    }
+
+    .controls button {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: #c0c0d0;
+      padding: 0.6rem 1.5rem;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: all 0.2s;
+    }
+
+    .controls button:hover {
+      background: rgba(255, 255, 255, 0.12);
+      border-color: rgba(255, 255, 255, 0.25);
+    }
+
+    .controls button.active {
+      background: rgba(100, 140, 255, 0.15);
+      border-color: rgba(100, 140, 255, 0.4);
+      color: #88aaff;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1rem;
+      max-width: 500px;
+      margin: 0 auto 3rem;
+    }
+
+    .stat-card {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 10px;
+      padding: 0.8rem;
+    }
+
+    .stat-card .stat-value {
+      font-size: 1.3rem;
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .stat-card .stat-label {
+      font-size: 0.7rem;
+      color: #666688;
+      margin-top: 0.2rem;
+    }
+
+    .history {
+      max-width: 500px;
+      margin: 0 auto;
+    }
+
+    .history-title {
+      font-size: 0.8rem;
+      color: #555577;
+      margin-bottom: 0.5rem;
+      letter-spacing: 2px;
+    }
+
+    .history-bar {
+      display: flex;
+      gap: 3px;
+      height: 40px;
+      align-items: flex-end;
+      justify-content: center;
+    }
+
+    .history-bar .bar {
+      width: 12px;
+      border-radius: 3px 3px 0 0;
+      transition: height 0.3s ease, background 0.3s ease;
+      min-height: 2px;
+    }
+
+    .range-selector {
+      display: flex;
+      gap: 0.5rem;
+      justify-content: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .range-selector input {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: #c0c0d0;
+      padding: 0.5rem 0.8rem;
+      border-radius: 6px;
+      width: 80px;
+      text-align: center;
+      font-size: 0.9rem;
+      outline: none;
+    }
+
+    .range-selector input:focus {
+      border-color: rgba(100, 140, 255, 0.5);
+    }
+
+    .range-selector span {
+      display: flex;
+      align-items: center;
+      color: #666688;
+      font-size: 0.85rem;
+    }
+
+    .back-link {
+      margin-top: 2rem;
+      font-size: 0.8rem;
+    }
+
+    .back-link a {
+      color: #555577;
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .back-link a:hover {
+      color: #8888aa;
+    }
+
+    @media (max-width: 600px) {
+      .number-display {
+        font-size: 5rem;
+      }
+      .number-display.small {
+        font-size: 2.5rem;
+      }
+      .stats {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .title {
+        font-size: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <canvas id="particles"></canvas>
+
+  <div class="container">
+    <div class="title">← 随机数生成器 →</div>
+
+    <div class="range-selector">
+      <input type="number" id="minVal" value="0" min="-99999" max="99999">
+      <span>—</span>
+      <input type="number" id="maxVal" value="100" min="-99999" max="99999">
+    </div>
+
+    <div id="numberDisplay" class="number-display">50</div>
+    <div class="label">每秒更新 · 完全随机</div>
+
+    <div class="controls">
+      <button id="typeInt" class="active">整数</button>
+      <button id="typeFloat">小数</button>
+      <button id="toggleBtn">暂停</button>
+    </div>
+
+    <div class="stats">
+      <div class="stat-card">
+        <div class="stat-value" id="statMin">-</div>
+        <div class="stat-label">最小值</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="statMax">-</div>
+        <div class="stat-label">最大值</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="statAvg">-</div>
+        <div class="stat-label">平均值</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="statCount">0</div>
+        <div class="stat-label">生成次数</div>
+      </div>
+    </div>
+
+    <div class="history">
+      <div class="history-title">最近 20 次</div>
+      <div class="history-bar" id="historyBar"></div>
+    </div>
+
+    <div class="back-link">
+      <a href="/">← 返回博客首页</a>
+    </div>
+  </div>
+
+  <script>
+    // --- 粒子背景 ---
+    (function() {
+      const canvas = document.getElementById('particles');
+      const ctx = canvas.getContext('2d');
+      let particles = [];
+      let animId;
+
+      function resize() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+      }
+      resize();
+      window.addEventListener('resize', resize);
+
+      for (let i = 0; i < 80; i++) {
+        particles.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height,
+          r: Math.random() * 2 + 0.5,
+          dx: (Math.random() - 0.5) * 0.5,
+          dy: (Math.random() - 0.5) * 0.5,
+          o: Math.random() * 0.5 + 0.1
+        });
+      }
+
+      function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        particles.forEach(p => {
+          p.x += p.dx;
+          p.y += p.dy;
+          if (p.x < 0) p.x = canvas.width;
+          if (p.x > canvas.width) p.x = 0;
+          if (p.y < 0) p.y = canvas.height;
+          if (p.y > canvas.height) p.y = 0;
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(100, 140, 255, ${p.o})`;
+          ctx.fill();
+        });
+
+        // 连线
+        for (let i = 0; i < particles.length; i++) {
+          for (let j = i + 1; j < particles.length; j++) {
+            const dx = particles[i].x - particles[j].x;
+            const dy = particles[i].y - particles[j].y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            if (dist < 120) {
+              ctx.beginPath();
+              ctx.moveTo(particles[i].x, particles[i].y);
+              ctx.lineTo(particles[j].x, particles[j].y);
+              ctx.strokeStyle = `rgba(100, 140, 255, ${0.08 * (1 - dist / 120)})`;
+              ctx.lineWidth = 0.5;
+              ctx.stroke();
+            }
+          }
+        }
+
+        animId = requestAnimationFrame(draw);
+      }
+      draw();
+    })();
+
+    // --- 随机数生成器 ---
+    (function() {
+      const numberDisplay = document.getElementById('numberDisplay');
+      const minInput = document.getElementById('minVal');
+      const maxInput = document.getElementById('maxVal');
+      const typeInt = document.getElementById('typeInt');
+      const typeFloat = document.getElementById('typeFloat');
+      const toggleBtn = document.getElementById('toggleBtn');
+
+      const statMin = document.getElementById('statMin');
+      const statMax = document.getElementById('statMax');
+      const statAvg = document.getElementById('statAvg');
+      const statCount = document.getElementById('statCount');
+      const historyBar = document.getElementById('historyBar');
+
+      let isInt = true;
+      let running = true;
+      let intervalId = null;
+      let history = [];
+      let values = [];
+      const MAX_HISTORY = 20;
+
+      function hslToRgb(h, s, l) {
+        s /= 100;
+        l /= 100;
+        const k = n => (n + h / 30) % 12;
+        const a = s * Math.min(l, 1 - l);
+        const f = n => l - a * Math.max(-1, Math.min(k(n) - 3, 9 - k(n), 1));
+        return [f(0), f(8), f(4)];
+      }
+
+      function generate() {
+        let min = parseFloat(minInput.value) || 0;
+        let max = parseFloat(maxInput.value) || 100;
+        if (min > max) { [min, max] = [max, min]; }
+
+        let value;
+        if (isInt) {
+          value = Math.floor(Math.random() * (max - min + 1)) + min;
+        } else {
+          value = Math.random() * (max - min) + min;
+          value = parseFloat(value.toFixed(4));
+        }
+
+        // 更新显示
+        numberDisplay.textContent = value;
+
+        // 根据值改变颜色
+        const range = max - min || 1;
+        const ratio = (value - min) / range;
+        const hue = 200 + ratio * 140; // 蓝色到紫色范围
+        numberDisplay.style.color = `hsl(${hue}, 70%, 60%)`;
+
+        // 根据数字长度调整字号
+        const len = String(value).length;
+        if (len > 8) {
+          numberDisplay.style.fontSize = '3rem';
+          numberDisplay.classList.add('small');
+        } else if (len > 5) {
+          numberDisplay.style.fontSize = '5rem';
+          numberDisplay.classList.add('small');
+        } else {
+          numberDisplay.style.fontSize = '';
+          numberDisplay.classList.remove('small');
+        }
+
+        // 更新统计
+        values.push(value);
+        const count = values.length;
+        const minV = Math.min(...values);
+        const maxV = Math.max(...values);
+        const avg = values.reduce((a, b) => a + b, 0) / count;
+
+        statMin.textContent = isInt ? Math.round(minV) : minV.toFixed(2);
+        statMax.textContent = isInt ? Math.round(maxV) : maxV.toFixed(2);
+        statAvg.textContent = avg.toFixed(2);
+        statCount.textContent = count;
+
+        // 更新历史柱状图
+        history.push(value);
+        if (history.length > MAX_HISTORY) history.shift();
+
+        const histMin = Math.min(...history);
+        const histMax = Math.max(...history);
+        const histRange = histMax - histMin || 1;
+
+        historyBar.innerHTML = '';
+        history.forEach((v, idx) => {
+          const bar = document.createElement('div');
+          bar.className = 'bar';
+          const hRatio = (v - histMin) / histRange;
+          bar.style.height = `${20 + hRatio * 20}px`;
+          const hueBar = 200 + hRatio * 140;
+          bar.style.background = `hsl(${hueBar}, 70%, 55%)`;
+          if (idx === history.length - 1) {
+            bar.style.opacity = '1';
+            bar.style.boxShadow = `0 0 8px hsl(${hueBar}, 70%, 55%)`;
+          } else {
+            bar.style.opacity = '0.5';
+          }
+          historyBar.appendChild(bar);
+        });
+      }
+
+      function start() {
+        if (intervalId) clearInterval(intervalId);
+        intervalId = setInterval(generate, 1000);
+        generate(); // 立即生成一个
+      }
+
+      function stop() {
+        if (intervalId) {
+          clearInterval(intervalId);
+          intervalId = null;
+        }
+      }
+
+      // 初始化
+      start();
+
+      // 控制按钮
+      toggleBtn.addEventListener('click', () => {
+        running = !running;
+        if (running) {
+          start();
+          toggleBtn.textContent = '暂停';
+          toggleBtn.classList.remove('active');
+        } else {
+          stop();
+          toggleBtn.textContent = '继续';
+          toggleBtn.classList.add('active');
+        }
+      });
+
+      typeInt.addEventListener('click', () => {
+        isInt = true;
+        typeInt.classList.add('active');
+        typeFloat.classList.remove('active');
+        // 重置统计
+        values = [];
+        history = [];
+      });
+
+      typeFloat.addEventListener('click', () => {
+        isInt = false;
+        typeFloat.classList.add('active');
+        typeInt.classList.remove('active');
+        values = [];
+        history = [];
+      });
+
+      // 范围变化时重置
+      minInput.addEventListener('change', () => { values = []; history = []; });
+      maxInput.addEventListener('change', () => { values = []; history = []; });
+
+      // 页面可见性变化：切回时继续
+      document.addEventListener('visibilitychange', () => {
+        if (!document.hidden && running && !intervalId) {
+          start();
+        }
+      });
+    })();
+  </script>
+</body>
+</html>

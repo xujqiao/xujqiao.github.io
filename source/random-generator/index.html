@@ -1,0 +1,1131 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>多种随机数生成算法 · 交互演示</title>
+<style>
+  :root {
+    --bg: #f8f9fa;
+    --surface: #ffffff;
+    --text: #1a1a2e;
+    --text-dim: #6c757d;
+    --primary: #4361ee;
+    --primary-light: #eef0ff;
+    --accent: #f72585;
+    --border: #dee2e6;
+    --radius: 12px;
+    --shadow: 0 2px 12px rgba(0,0,0,.06);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans SC", sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    padding: 20px;
+  }
+
+  .container {
+    max-width: 960px;
+    margin: 0 auto;
+  }
+
+  header {
+    text-align: center;
+    padding: 32px 0 24px;
+  }
+
+  header h1 {
+    font-size: 1.8rem;
+    font-weight: 700;
+    letter-spacing: -.02em;
+  }
+
+  header p {
+    color: var(--text-dim);
+    margin-top: 6px;
+    font-size: .95rem;
+  }
+
+  .card {
+    background: var(--surface);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 24px;
+    margin-bottom: 20px;
+  }
+
+  .card h2 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .card h2 small {
+    font-size: .8rem;
+    font-weight: 400;
+    color: var(--text-dim);
+  }
+
+  .controls {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  .controls .full { grid-column: 1 / -1; }
+
+  .control-group label {
+    display: block;
+    font-size: .85rem;
+    font-weight: 500;
+    margin-bottom: 4px;
+    color: var(--text-dim);
+  }
+
+  .control-group select,
+  .control-group input,
+  .control-group button {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: .9rem;
+    background: var(--bg);
+    color: var(--text);
+    transition: border-color .2s;
+  }
+
+  .control-group select:focus,
+  .control-group input:focus {
+    outline: none;
+    border-color: var(--primary);
+  }
+
+  .controls-row {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .controls-row .control-group {
+    flex: 1;
+    min-width: 100px;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    font-size: .9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all .2s;
+  }
+
+  .btn-primary {
+    background: var(--primary);
+    color: #fff;
+  }
+  .btn-primary:hover { filter: brightness(1.1); }
+
+  .btn-outline {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text);
+  }
+  .btn-outline:hover { background: var(--bg); }
+
+  .btn-accent {
+    background: var(--accent);
+    color: #fff;
+  }
+  .btn-accent:hover { filter: brightness(1.1); }
+
+  .btn-group {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  /* Output area */
+  .output-area {
+    margin-top: 16px;
+  }
+
+  .output-numbers {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    min-height: 48px;
+    padding: 12px;
+    background: var(--bg);
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    font-family: "SF Mono", "Fira Code", "Consolas", monospace;
+    font-size: .9rem;
+    align-content: flex-start;
+  }
+
+  .output-numbers .num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 44px;
+    height: 36px;
+    padding: 0 10px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-weight: 500;
+    transition: all .2s;
+    animation: pop-in .25s ease;
+  }
+
+  .num.highlight-0 { border-color: #4361ee; background: #eef0ff; }
+  .num.highlight-1 { border-color: #f72585; background: #fef0f6; }
+  .num.highlight-2 { border-color: #06d6a0; background: #e6faf4; }
+  .num.highlight-3 { border-color: #ffd166; background: #fff8e6; }
+  .num.highlight-4 { border-color: #7209b7; background: #f0e6f9; }
+
+  @keyframes pop-in {
+    0% { transform: scale(.7); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 12px;
+    margin-top: 16px;
+  }
+
+  .stat-item {
+    text-align: center;
+    padding: 12px;
+    background: var(--bg);
+    border-radius: 8px;
+  }
+
+  .stat-item .val {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--primary);
+  }
+
+  .stat-item .label {
+    font-size: .8rem;
+    color: var(--text-dim);
+    margin-top: 2px;
+  }
+
+  /* Chart */
+  .chart-container {
+    margin-top: 16px;
+    position: relative;
+  }
+
+  .chart-bars {
+    display: flex;
+    align-items: flex-end;
+    gap: 2px;
+    height: 160px;
+    padding: 0 4px;
+  }
+
+  .chart-bars .bar {
+    flex: 1;
+    background: var(--primary);
+    border-radius: 3px 3px 0 0;
+    transition: height .4s ease;
+    min-height: 2px;
+    opacity: .8;
+  }
+
+  .chart-bars .bar:hover { opacity: 1; }
+
+  .chart-labels {
+    display: flex;
+    gap: 2px;
+    padding: 4px 4px 0;
+  }
+
+  .chart-labels .label {
+    flex: 1;
+    font-size: .65rem;
+    color: var(--text-dim);
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* Info panel */
+  .algo-info {
+    margin-top: 16px;
+    padding: 16px;
+    background: var(--primary-light);
+    border-radius: 8px;
+    border-left: 4px solid var(--primary);
+    font-size: .9rem;
+    line-height: 1.7;
+    display: none;
+  }
+
+  .algo-info.show { display: block; }
+
+  .algo-info code {
+    font-size: .85rem;
+    background: rgba(67, 97, 238, .1);
+    padding: 2px 6px;
+    border-radius: 4px;
+  }
+
+  .algo-info strong { color: var(--primary); }
+
+  /* Seed display */
+  .seed-display {
+    font-size: .85rem;
+    color: var(--text-dim);
+    margin-top: 8px;
+    font-family: "SF Mono", "Fira Code", monospace;
+  }
+
+  .badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: .75rem;
+    font-weight: 600;
+  }
+  .badge-fast { background: #d4edda; color: #155724; }
+  .badge-secure { background: #f8d7da; color: #721c24; }
+  .badge-historic { background: #fff3cd; color: #856404; }
+  .badge-modern { background: #cce5ff; color: #004085; }
+
+  .tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
+
+  /* Live mode */
+  .live-indicator {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #f72585;
+    margin-right: 6px;
+    animation: blink 1s ease-in-out infinite;
+  }
+
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: .2; }
+  }
+
+  .btn-live-on {
+    background: #f72585 !important;
+    color: #fff !important;
+  }
+
+  /* Range slider styling */
+  input[type="range"] {
+    -webkit-appearance: none;
+    appearance: none;
+    height: 6px;
+    border-radius: 3px;
+    background: var(--border);
+    outline: none;
+    padding: 0;
+    border: none;
+  }
+
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--primary);
+    cursor: pointer;
+    border: 2px solid #fff;
+    box-shadow: 0 1px 4px rgba(0,0,0,.15);
+  }
+
+  footer {
+    text-align: center;
+    padding: 24px 0;
+    color: var(--text-dim);
+    font-size: .85rem;
+  }
+
+  @media (max-width: 640px) {
+    .controls { grid-template-columns: 1fr; }
+    header h1 { font-size: 1.4rem; }
+    body { padding: 12px; }
+    .card { padding: 16px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+<header>
+  <h1>🎲 随机数生成算法 · 交互演示</h1>
+  <p>多种经典 PRNG 算法实现，可观察分布与统计特征</p>
+</header>
+
+<!-- Controls -->
+<div class="card">
+  <h2>⚙️ 算法控制</h2>
+  <div class="controls">
+    <div class="control-group full">
+      <label for="algo-select">选择算法</label>
+      <select id="algo-select"></select>
+    </div>
+    <div class="control-group full controls-row" id="param-row">
+      <div class="control-group">
+        <label for="seed-input">种子 (Seed)</label>
+        <input type="number" id="seed-input" value="42" min="1" max="2147483647">
+      </div>
+      <div class="control-group">
+        <label for="count-input">生成数量</label>
+        <input type="number" id="count-input" value="50" min="5" max="500">
+      </div>
+      <div class="control-group">
+        <label for="range-min">最小值</label>
+        <input type="number" id="range-min" value="0">
+      </div>
+      <div class="control-group">
+        <label for="range-max">最大值</label>
+        <input type="number" id="range-max" value="100">
+      </div>
+    </div>
+    <div class="control-group full btn-group">
+      <button class="btn btn-primary" id="btn-generate">▶ 生成</button>
+      <button class="btn btn-accent" id="btn-live">🔴 实时流</button>
+      <button class="btn btn-outline" id="btn-copy">📋 复制</button>
+      <button class="btn btn-outline" id="btn-random-seed">🔀 随机种子</button>
+    </div>
+    <div class="control-group full" id="live-controls" style="display:none">
+      <div class="controls-row">
+        <div class="control-group">
+          <label for="speed-input">流速 (ms/个)</label>
+          <input type="range" id="speed-input" min="10" max="500" value="50" step="10">
+          <span id="speed-label" style="font-size:.85rem;color:var(--text-dim)">50ms</span>
+        </div>
+        <div class="control-group">
+          <label for="max-stream">缓存数量</label>
+          <input type="number" id="max-stream" value="200" min="20" max="2000" step="10">
+        </div>
+        <div class="control-group">
+          <label>&nbsp;</label>
+          <button class="btn btn-outline" id="btn-clear-stream" style="height:38px">🗑️ 清空</button>
+        </div>
+        <div class="control-group" id="stream-status">
+          <label>状态</label>
+          <div style="font-size:.9rem;padding:8px 0">
+            <span id="stream-counter">0</span> 个 · <span id="stream-duration">0</span>s
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Output -->
+<div class="card">
+  <h2>📊 输出结果 <small id="algo-name"></small></h2>
+  <div class="output-numbers" id="output-numbers">
+    <span style="color:var(--text-dim);width:100%;text-align:center;padding:12px">点击"生成随机数"查看结果</span>
+  </div>
+  <div class="seed-display" id="seed-display"></div>
+
+  <div class="stats">
+    <div class="stat-item">
+      <div class="val" id="stat-count">0</div>
+      <div class="label">样本数</div>
+    </div>
+    <div class="stat-item">
+      <div class="val" id="stat-mean">—</div>
+      <div class="label">平均值</div>
+    </div>
+    <div class="stat-item">
+      <div class="val" id="stat-min">—</div>
+      <div class="label">最小值</div>
+    </div>
+    <div class="stat-item">
+      <div class="val" id="stat-max">—</div>
+      <div class="label">最大值</div>
+    </div>
+    <div class="stat-item">
+      <div class="val" id="stat-std">—</div>
+      <div class="label">标准差</div>
+    </div>
+    <div class="stat-item">
+      <div class="val" id="stat-entropy">—</div>
+      <div class="label">信息熵 (bits)</div>
+    </div>
+  </div>
+
+  <div class="chart-container">
+    <h2 style="font-size:.95rem;margin-bottom:8px">📈 分布直方图</h2>
+    <div class="chart-bars" id="chart-bars"></div>
+    <div class="chart-labels" id="chart-labels"></div>
+  </div>
+</div>
+
+<!-- Algorithm Info -->
+<div class="card algo-info" id="algo-info"></div>
+
+<footer>
+  <p>📝 这些算法在浏览器端实现，仅供学习和演示用途，不应用于密码学安全场景。</p>
+</footer>
+
+</div>
+
+<script>
+// ====================================================================
+// 随机数生成算法合集
+// ====================================================================
+
+class RNG {
+  constructor(seed) { this.seed = seed >>> 0; this.state = seed >>> 0; }
+  reset() { this.state = this.seed >>> 0; }
+  next() { return 0; } // override
+  nextFloat() { return this.next() / 0xFFFFFFFF; }
+  nextRange(min, max) {
+    const range = max - min + 1;
+    return min + (this.next() % range);
+  }
+  nextFloatRange(min, max) {
+    return min + this.nextFloat() * (max - min);
+  }
+  getName() { return 'Base RNG'; }
+  getDesc() { return ''; }
+  getTags() { return []; }
+}
+
+/* --- 1. LCG (Linear Congruential Generator) --- */
+class LCG extends RNG {
+  constructor(seed) {
+    super(seed);
+    this.a = 1664525;
+    this.c = 1013904223;
+    this.m = 0xFFFFFFFF;
+  }
+  next() {
+    this.state = (this.a * this.state + this.c) >>> 0;
+    return this.state;
+  }
+  getName() { return '线性同余法 (LCG)'; }
+  getDesc() { return '最经典的 PRNG，当前使用 <code>a=1664525, c=1013904223, m=2³²</code>（Numerical Recipes 参数）。速度快但周期有限，低比特位随机性较差。广泛用于 C 标准库 <code>rand()</code> 的早期实现。'; }
+  getTags() { return ['fast']; }
+}
+
+/* --- 2. Middle Square Method (von Neumann) --- */
+class MiddleSquare extends RNG {
+  constructor(seed) {
+    super(seed);
+    // Ensure seed is within valid range (not too small)
+    if (this.state < 1000) this.state = this.state + 1000;
+  }
+  next() {
+    const squared = BigInt(this.state) * BigInt(this.state);
+    const s = squared.toString(10).padStart(8, '0');
+    this.state = parseInt(s.substring(2, 6), 10);
+    if (this.state === 0) this.state = this.seed; // fallback on zero
+    return this.state * 4294967 >>> 0;
+  }
+  getName() { return '平方取中法 (Middle Square)'; }
+  getDesc() { return '由 <strong>冯·诺依曼 (John von Neumann)</strong> 于 1946 年提出，是历史上第一个伪随机数生成算法。将当前值平方后取中间几位作为下一个值。虽然周期短且容易退化，但开创了 PRNG 的先河。'; }
+  getTags() { return ['historic']; }
+}
+
+/* --- 3. Xorshift (32-bit) --- */
+class XorShift extends RNG {
+  next() {
+    let x = this.state >>> 0;
+    x ^= x << 13;
+    x ^= x >> 17;
+    x ^= x << 5;
+    this.state = x >>> 0;
+    return x;
+  }
+  getName() { return 'Xorshift (32-bit)'; }
+  getDesc() { return '由 <strong>George Marsaglia</strong> 于 2003 年提出。仅使用 XOR 和移位操作，非常快速且状态极小。通过 <code>x ^= x<<13; x ^= x>>17; x ^= x<<5</code> 三步获得良好统计性质。'; }
+  getTags() { return ['fast', 'modern']; }
+}
+
+/* --- 4. Xorshift128+ --- */
+class XorShift128 extends RNG {
+  constructor(seed) {
+    super(seed);
+    this.state2 = (seed * 6364136223846793005n + 1442695040888963407n) & 0xFFFFFFFFn;
+  }
+  next() {
+    let s1 = BigInt(this.state);
+    let s0 = this.state2;
+    this.state = Number(s0);
+    s1 ^= s1 << 23n;
+    this.state2 = Number((s1 ^ s0 ^ (s1 >> 17n) ^ (s0 >> 26n)));
+    return Number((BigInt(this.state) + BigInt(this.state2)) & 0xFFFFFFFFn) >>> 0;
+  }
+  getName() { return 'Xorshift128+'; }
+  getDesc() { return 'Xorshift 的增强版本，使用 128-bit 状态（两个 64-bit 字）。是 V8 (Chrome/Node.js) 中 <code>Math.random()</code> 的早期实现基础。通过期极长 (2¹²⁸ - 1)，通过了 BigCrush 测试集的大部分。'; }
+  getTags() { return ['fast', 'modern']; }
+}
+
+/* --- 5. Mersenne Twister (simplified MT19937) --- */
+class MersenneTwister extends RNG {
+  constructor(seed) {
+    super(seed);
+    this.mt = new Uint32Array(624);
+    this.index = 0;
+    this._init(seed);
+  }
+  _init(seed) {
+    this.mt[0] = seed >>> 0;
+    for (let i = 1; i < 624; i++) {
+      this.mt[i] = (1812433253 * (this.mt[i-1] ^ (this.mt[i-1] >>> 30)) + i) >>> 0;
+    }
+    this.state = seed >>> 0;
+  }
+  _twist() {
+    for (let i = 0; i < 624; i++) {
+      const y = (this.mt[i] & 0x80000000) + (this.mt[(i+1) % 624] & 0x7FFFFFFF);
+      this.mt[i] = this.mt[(i+397) % 624] ^ (y >>> 1);
+      if (y % 2 !== 0) this.mt[i] ^= 0x9908B0DF;
+    }
+    this.index = 0;
+  }
+  next() {
+    if (this.index >= 624) this._twist();
+    let y = this.mt[this.index++];
+    y ^= (y >>> 11);
+    y ^= (y << 7) & 0x9D2C5680;
+    y ^= (y << 15) & 0xEFC60000;
+    y ^= (y >>> 18);
+    return y >>> 0;
+  }
+  reset() {
+    this._init(this.seed);
+    this.index = 0;
+  }
+  getName() { return '梅森旋转法 (MT19937)'; }
+  getDesc() { return '由 <strong>松本眞·西村拓士</strong> 于 1996 年提出。周期长达 2¹⁹⁹³⁷−1，是现今最广泛使用的 PRNG 之一（Python、R、MATLAB 等语言的默认算法）。624 字内部状态，通过了 DIEHARD 和 BigCrush 测试。'; }
+  getTags() { return ['modern']; }
+}
+
+/* --- 6. Blum Blum Shub --- */
+class BlumBlumShub extends RNG {
+  constructor(seed) {
+    super(seed);
+    this.p = 499n;    // p ≡ 3 mod 4, prime
+    this.q = 547n;    // q ≡ 3 mod 4, prime
+    this.n = this.p * this.q;
+    // Seed must be coprime to n
+    this.x = (BigInt(seed) * BigInt(seed)) % this.n;
+    if (this.x === 0n) this.x = 2n;
+  }
+  next() {
+    this.x = (this.x * this.x) % this.n;
+    // Return least significant bit, but construct 32-bit number
+    let result = 0;
+    let temp = this.x;
+    for (let i = 0; i < 32; i++) {
+      temp = (temp * temp) % this.n;
+      result = (result << 1) | Number(temp & 1n);
+    }
+    return result >>> 0;
+  }
+  getName() { return 'Blum Blum Shub'; }
+  getDesc() { return '由 <strong>L. Blum, M. Blum 和 M. Shub</strong> 于 1986 年提出的密码学安全 PRNG (CSPRNG)。<code>xₙ₊₁ = xₙ² mod n</code>，其中 <code>n=p·q</code>（p, q 均为 ≡3 mod 4 的大素数）。安全性基于大数分解的难度，但速度较慢。'; }
+  getTags() { return ['secure']; }
+}
+
+/* --- 7. PCG (Permuted Congruential Generator, simplified) --- */
+class PCG extends RNG {
+  constructor(seed) {
+    super(seed);
+    this.inc = 1442695040888963407n;
+    this.state64 = BigInt(seed);
+  }
+  next() {
+    const old = this.state64;
+    this.state64 = old * 6364136223846793005n + this.inc;
+    const xorshifted = Number((((old >> 18n) ^ old) >> 27n) & 0xFFFFFFFFn);
+    const rot = Number((old >> 59n) & 0x1Fn);
+    return ((xorshifted >>> rot) | (xorshifted << ((-rot) & 31))) >>> 0;
+  }
+  reset() {
+    this.state64 = BigInt(this.seed);
+  }
+  getName() { return 'PCG (Permuted Congruential Generator)'; }
+  getDesc() { return '由 <strong>Melissa O&#x27;Neill</strong> 于 2014 年提出。在 LCG 基础上增加 permutation 步骤，显著提升了统计质量。速度接近 LCG，但能通过 BigCrush 全套测试。被认为是 LCG 的现代替代品。'; }
+  getTags() { return ['fast', 'modern']; }
+}
+
+/* --- 8. LFSR (Linear Feedback Shift Register) --- */
+class LFSR extends RNG {
+  constructor(seed) {
+    super(seed);
+    if (this.state === 0) this.state = 1;
+    this.lfsr = this.state >>> 0;
+  }
+  next() {
+    const bit = ((this.lfsr >> 0) ^ (this.lfsr >> 2) ^ (this.lfsr >> 3) ^ (this.lfsr >> 5)) & 1;
+    this.lfsr = (this.lfsr >> 1) | (bit << 31);
+    return this.lfsr >>> 0;
+  }
+  getName() { return '线性反馈移位寄存器 (LFSR)'; }
+  getDesc() { return 'LFSR 使用线性递推生成比特流，硬件实现非常高效。本实现使用本原多项式 <code>x³² + x⁷ + x⁵ + x³ + x² + x + 1</code>，周期为 2³²−1。广泛用于通信中的伪随机序列和白噪声生成。'; }
+  getTags() { return ['fast']; }
+}
+
+/* --- 9. Rule30 Cellular Automaton --- */
+class Rule30 extends RNG {
+  constructor(seed) {
+    super(seed);
+    // Represent state as a bit array (31 cells)
+    this.cells = new Array(31).fill(0);
+    const s = seed >>> 0;
+    for (let i = 0; i < 31; i++) {
+      this.cells[i] = (s >> i) & 1;
+    }
+  }
+  _step() {
+    const next = new Array(31).fill(0);
+    for (let i = 0; i < 31; i++) {
+      const left = this.cells[i - 1] || 0;
+      const center = this.cells[i];
+      const right = this.cells[i + 1] || 0;
+      // Rule 30: (left XOR (center OR right))
+      next[i] = left ^ (center | right);
+    }
+    this.cells = next;
+  }
+  next() {
+    let result = 0;
+    for (let i = 0; i < 32; i++) {
+      this._step();
+      result = (result << 1) | this.cells[15]; // center cell
+    }
+    return result >>> 0;
+  }
+  reset() {
+    const s = this.seed >>> 0;
+    this.cells = new Array(31).fill(0);
+    for (let i = 0; i < 31; i++) {
+      this.cells[i] = (s >> i) & 1;
+    }
+  }
+  getName() { return '元胞自动机 (Rule 30)'; }
+  getDesc() { return '由 <strong>Stephen Wolfram</strong> 在 Mathematica 中使用的元胞自动机随机数生成器。Rule 30 是一维元胞自动机规则，展现混沌行为，能产生高质量的随机序列。Wolfram 认为它可媲美传统 PRNG。'; }
+  getTags() { return ['modern']; }
+}
+
+/* --- 10. Fibonacci Lagged Generator --- */
+class FiboLagged extends RNG {
+  constructor(seed) {
+    super(seed);
+    this.j = 7;
+    this.k = 10;
+    this.buffer = new Array(this.k + 1).fill(0);
+    // Initialize using another generator
+    let temp = new XorShift(seed + 1);
+    for (let i = 0; i <= this.k; i++) {
+      this.buffer[i] = temp.next();
+    }
+    this.idx = 0;
+  }
+  next() {
+    const r = this.buffer[(this.idx + this.k) % (this.k + 1)];
+    const s = this.buffer[(this.idx + this.j) % (this.k + 1)];
+    this.buffer[this.idx] = (r + s) >>> 0;
+    const result = this.buffer[this.idx];
+    this.idx = (this.idx + 1) % (this.k + 1);
+    return result;
+  }
+  getName() { return 'Fibonacci 延迟生成器'; }
+  getDesc() { return '使用延迟 Fibonacci 序列：<code>Xₙ = Xₙ₋ⱼ + Xₙ₋ₖ (mod 2³²)</code>。本实现使用 <code>j=7, k=10</code>。需要较大的状态空间，周期可达到 2ᵏ−1 的量级，统计性质优于简单 LCG。'; }
+  getTags() { return ['modern']; }
+}
+
+// ====================================================================
+// 算法注册
+// ====================================================================
+const algorithms = {
+  lcg:         { cls: LCG,         name: 'LCG',         tags: ['fast'] },
+  middleSquare:{ cls: MiddleSquare, name: '平方取中法',   tags: ['historic'] },
+  xorShift:    { cls: XorShift,     name: 'Xorshift',    tags: ['fast','modern'] },
+  xorShift128: { cls: XorShift128,  name: 'Xorshift128+',tags: ['fast','modern'] },
+  mt19937:     { cls: MersenneTwister, name: 'MT19937',tags: ['modern'] },
+  bbs:         { cls: BlumBlumShub, name: 'Blum Blum Shub', tags: ['secure'] },
+  pcg:         { cls: PCG,          name: 'PCG',         tags: ['fast','modern'] },
+  lfsr:        { cls: LFSR,         name: 'LFSR',        tags: ['fast'] },
+  rule30:      { cls: Rule30,       name: 'Rule 30',     tags: ['modern'] },
+  fiboLagged:  { cls: FiboLagged,   name: 'Fibonacci延迟', tags: ['modern'] },
+};
+
+// ====================================================================
+// UI
+// ====================================================================
+let currentAlgo = 'lcg';
+let lastNumbers = [];
+
+const algoSelect = document.getElementById('algo-select');
+const seedInput = document.getElementById('seed-input');
+const countInput = document.getElementById('count-input');
+const rangeMin = document.getElementById('range-min');
+const rangeMax = document.getElementById('range-max');
+const outputDiv = document.getElementById('output-numbers');
+const statCount = document.getElementById('stat-count');
+const statMean = document.getElementById('stat-mean');
+const statMin = document.getElementById('stat-min');
+const statMax = document.getElementById('stat-max');
+const statStd = document.getElementById('stat-std');
+const statEntropy = document.getElementById('stat-entropy');
+const chartBars = document.getElementById('chart-bars');
+const chartLabels = document.getElementById('chart-labels');
+const algoInfo = document.getElementById('algo-info');
+const algoName = document.getElementById('algo-name');
+const seedDisplay = document.getElementById('seed-display');
+
+const btnGenerate = document.getElementById('btn-generate');
+const btnCopy = document.getElementById('btn-copy');
+const btnRandomSeed = document.getElementById('btn-random-seed');
+const btnLive = document.getElementById('btn-live');
+const btnClearStream = document.getElementById('btn-clear-stream');
+const liveControls = document.getElementById('live-controls');
+const speedInput = document.getElementById('speed-input');
+const speedLabel = document.getElementById('speed-label');
+const maxStreamInput = document.getElementById('max-stream');
+const streamCounter = document.getElementById('stream-counter');
+const streamDuration = document.getElementById('stream-duration');
+
+// Live stream state
+let isLive = false;
+let liveTimer = null;
+let liveRng = null;
+let liveStartTime = 0;
+let streamData = [];
+
+// Speed label update
+speedInput.addEventListener('input', () => {
+  speedLabel.textContent = `${speedInput.value}ms`;
+});
+
+function populateSelect() {
+  algoSelect.innerHTML = '';
+  for (const [key, val] of Object.entries(algorithms)) {
+    const opt = document.createElement('option');
+    opt.value = key;
+    opt.textContent = val.cls.prototype.getName ? new val.cls(0).getName() : key;
+    algoSelect.appendChild(opt);
+  }
+}
+
+function getTagBadge(tag) {
+  const map = { fast: 'fast', secure: 'secure', historic: 'historic', modern: 'modern' };
+  const cls = map[tag] || 'modern';
+  return `<span class="badge badge-${cls}">${tag}</span>`;
+}
+
+function updateAlgoInfo() {
+  const cls = algorithms[currentAlgo].cls;
+  const rng = new cls(parseInt(seedInput.value) || Date.now());
+  algoName.textContent = `— ${rng.getName()}`;
+  algoInfo.innerHTML = `
+    <p>${rng.getDesc()}</p>
+    <div class="tags">${rng.getTags().map(getTagBadge).join('')}</div>
+  `;
+  algoInfo.classList.add('show');
+}
+
+function updateSeedDisplay() {
+  seedDisplay.textContent = `🔑 当前种子: ${seedInput.value} | 采样范围: [${rangeMin.value}, ${rangeMax.value}]`;
+}
+
+function generate() {
+  const cls = algorithms[currentAlgo].cls;
+  const seed = parseInt(seedInput.value) || Date.now();
+  const count = parseInt(countInput.value) || 50;
+  const min = parseInt(rangeMin.value) || 0;
+  const max = parseInt(rangeMax.value) || 100;
+
+  if (min >= max) { alert('最小值必须小于最大值'); return; }
+  if (count < 2) { alert('至少生成 2 个值'); return; }
+
+  const rng = new cls(seed);
+  lastNumbers = [];
+  for (let i = 0; i < count; i++) {
+    lastNumbers.push(rng.nextRange(min, max));
+  }
+  renderNumbers(lastNumbers, count);
+  updateStats(lastNumbers);
+  renderChart(lastNumbers, min, max);
+  updateSeedDisplay();
+}
+
+function renderNumbers(nums, count) {
+  outputDiv.innerHTML = '';
+  const colors = ['0','1','2','3','4'];
+  nums.forEach((n, i) => {
+    const span = document.createElement('span');
+    span.className = `num highlight-${colors[i % colors.length]}`;
+    span.textContent = n;
+    span.title = `#${i+1}: ${n}`;
+    outputDiv.appendChild(span);
+  });
+}
+
+function renderStreamNumber(n, index) {
+  // Remove oldest if over max
+  const maxStream = parseInt(maxStreamInput.value) || 200;
+  if (streamData.length > maxStream) {
+    streamData.splice(0, streamData.length - maxStream);
+  }
+
+  // In live mode, only show a simple status — no individual number tiles
+  const elapsed = ((Date.now() - liveStartTime) / 1000).toFixed(1);
+  outputDiv.innerHTML = `
+    <div style="width:100%;text-align:center;padding:16px;color:var(--text-dim);font-size:.95rem">
+      <span class="live-indicator"></span>
+      实时流运行中 · 已生成 <strong style="color:var(--primary)">${streamData.length}</strong> 个数 ·
+      耗时 ${elapsed}s
+    </div>
+  `;
+}
+
+function updateStats(nums) {
+  const n = nums.length;
+  const sum = nums.reduce((a,b)=>a+b, 0);
+  const mean = sum / n;
+  const mn = Math.min(...nums);
+  const mx = Math.max(...nums);
+  const variance = nums.reduce((a,b)=>a+(b-mean)**2, 0) / n;
+  const std = Math.sqrt(variance);
+
+  // Shannon entropy (approximate for discrete values)
+  const freq = {};
+  nums.forEach(v => { freq[v] = (freq[v]||0) + 1; });
+  let entropy = 0;
+  for (const v in freq) {
+    const p = freq[v] / n;
+    entropy -= p * Math.log2(p);
+  }
+
+  statCount.textContent = n;
+  statMean.textContent = mean.toFixed(2);
+  statMin.textContent = mn;
+  statMax.textContent = mx;
+  statStd.textContent = std.toFixed(3);
+  statEntropy.textContent = entropy.toFixed(2);
+}
+
+function renderChart(nums, min, max) {
+  const bins = 20;
+  const range = max - min;
+  const binSize = range / bins;
+  const histogram = new Array(bins).fill(0);
+  nums.forEach(v => {
+    const idx = Math.min(Math.floor((v - min) / binSize), bins - 1);
+    histogram[idx]++;
+  });
+
+  const maxCount = Math.max(...histogram, 1);
+  chartBars.innerHTML = '';
+  chartLabels.innerHTML = '';
+
+  histogram.forEach((count, i) => {
+    const bar = document.createElement('div');
+    bar.className = 'bar';
+    const pct = (count / maxCount) * 100;
+    bar.style.height = Math.max(2, pct) + '%';
+    bar.title = `${(min + i * binSize).toFixed(0)}–${(min + (i+1) * binSize).toFixed(0)}: ${count}个`;
+    chartBars.appendChild(bar);
+
+    const label = document.createElement('div');
+    label.className = 'label';
+    label.textContent = (min + i * binSize).toFixed(0);
+    chartLabels.appendChild(label);
+  });
+}
+
+// ====================================================================
+// Event handlers
+// ====================================================================
+
+algoSelect.addEventListener('change', () => {
+  currentAlgo = algoSelect.value;
+  updateAlgoInfo();
+  // Restart live stream if it's running
+  if (isLive) { stopLiveStream(); startLiveStream(); }
+});
+
+btnGenerate.addEventListener('click', () => {
+  if (isLive) stopLiveStream();
+  generate();
+});
+
+btnCopy.addEventListener('click', () => {
+  if (lastNumbers.length === 0) { alert('请先生成随机数'); return; }
+  const text = lastNumbers.join(', ');
+  navigator.clipboard.writeText(text).then(() => {
+    btnCopy.textContent = '✅ 已复制';
+    setTimeout(() => { btnCopy.textContent = '📋 复制结果'; }, 2000);
+  }).catch(() => {
+    // Fallback
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    btnCopy.textContent = '✅ 已复制';
+    setTimeout(() => { btnCopy.textContent = '📋 复制结果'; }, 2000);
+  });
+});
+
+btnRandomSeed.addEventListener('click', () => {
+  seedInput.value = Math.floor(Math.random() * 2147483647) + 1;
+  updateSeedDisplay();
+});
+
+// ====================================================================
+// Live stream mode
+// ====================================================================
+
+function startLiveStream() {
+  const cls = algorithms[currentAlgo].cls;
+  const seed = parseInt(seedInput.value) || Date.now();
+  const min = parseInt(rangeMin.value) || 0;
+  const max = parseInt(rangeMax.value) || 100;
+
+  if (min >= max) { alert('最小值必须小于最大值'); stopLiveStream(); return; }
+
+  liveRng = new cls(seed);
+  streamData = [];
+  liveStartTime = Date.now();
+  isLive = true;
+
+  btnLive.textContent = '⏹ 停止';
+  btnLive.className = 'btn btn-live-on';
+  liveControls.style.display = 'block';
+
+  // Disable static controls
+  btnGenerate.disabled = true;
+  btnGenerate.style.opacity = '.5';
+  algoSelect.disabled = true;
+  seedInput.disabled = true;
+  countInput.disabled = true;
+
+  streamCounter.textContent = '0';
+  streamDuration.textContent = '0';
+
+  tickStream();
+}
+
+function tickStream() {
+  if (!isLive) return;
+  const speed = parseInt(speedInput.value) || 50;
+  const min = parseInt(rangeMin.value) || 0;
+  const max = parseInt(rangeMax.value) || 100;
+
+  // Generate multiple numbers per tick at high speeds for better performance
+  const batchSize = speed < 30 ? 5 : speed < 100 ? 2 : 1;
+
+  for (let i = 0; i < batchSize; i++) {
+    if (!isLive) return;
+    const val = liveRng.nextRange(min, max);
+    streamData.push(val);
+  }
+
+  renderStreamNumber(null, streamData.length);
+  updateStats(streamData);
+  renderChart(streamData, parseInt(rangeMin.value) || 0, parseInt(rangeMax.value) || 100);
+
+  const elapsed = ((Date.now() - liveStartTime) / 1000).toFixed(1);
+  streamCounter.textContent = streamData.length;
+  streamDuration.textContent = elapsed;
+
+  // Schedule next tick
+  liveTimer = setTimeout(tickStream, speed);
+}
+
+function stopLiveStream() {
+  isLive = false;
+  if (liveTimer) { clearTimeout(liveTimer); liveTimer = null; }
+
+  btnLive.textContent = '🔴 实时流';
+  btnLive.className = 'btn btn-accent';
+  btnGenerate.disabled = false;
+  btnGenerate.style.opacity = '1';
+  algoSelect.disabled = false;
+  seedInput.disabled = false;
+  countInput.disabled = false;
+}
+
+btnLive.addEventListener('click', () => {
+  if (isLive) { stopLiveStream(); return; }
+  startLiveStream();
+});
+
+btnClearStream.addEventListener('click', () => {
+  if (isLive) {
+    streamData = [];
+    outputDiv.innerHTML = '';
+    streamCounter.textContent = '0';
+    liveStartTime = Date.now();
+  } else {
+    // If not live, clear everything
+    lastNumbers = [];
+    outputDiv.innerHTML = '<span style="color:var(--text-dim);width:100%;text-align:center;padding:12px">已清空</span>';
+    statCount.textContent = '0';
+    statMean.textContent = '—';
+    statMin.textContent = '—';
+    statMax.textContent = '—';
+    statStd.textContent = '—';
+    statEntropy.textContent = '—';
+    chartBars.innerHTML = '';
+    chartLabels.innerHTML = '';
+  }
+});
+
+// Keyboard shortcut: Enter to generate, Space to toggle live
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' && e.target.tagName === 'INPUT') {
+    if (e.target === seedInput && isLive) {
+      stopLiveStream();
+      startLiveStream();
+    } else if (!isLive) {
+      generate();
+    }
+  }
+  if (e.key === ' ' && e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
+    e.preventDefault();
+    btnLive.click();
+  }
+});
+
+// ====================================================================
+// Init
+// ====================================================================
+populateSelect();
+currentAlgo = 'lcg';
+algoSelect.value = 'lcg';
+updateAlgoInfo();
+updateSeedDisplay();
+generate();
+</script>
+</body>
+</html>

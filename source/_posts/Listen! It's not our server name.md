@@ -26,6 +26,8 @@ sudo netstat -antpl | grep 80
 tcp        0      0 0.0.0.0:80         0.0.0.0:*               LISTEN      1408/nginx: master  
 ```
 
+<!-- more -->
+
 带着这两个疑问，查找了nginx官方文档中相关配置的解释[server_name][server_name]，[listen][listen]，加上自己的实验，发现真正的结果是这样的
 
 

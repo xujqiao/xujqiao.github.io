@@ -13,6 +13,8 @@ tags:
 
 pathman是postgrespro公司开发的一款分区表功能的插件，不需要动用catalog，即可方便管理分区
 
+<!-- more -->
+
 ## 安装pathman
 
 > 本文参考[这篇文件](https://juejin.im/entry/581066a2bf22ec005841d07b)

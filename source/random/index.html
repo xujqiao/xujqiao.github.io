@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>随机数生成器</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: #0f0f23;
+      color: #e0e0e0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      overflow-x: hidden;
+    }
+
+    /* 粒子背景 */
+    #particles {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .container {
+      position: relative;
+      z-index: 1;
+      text-align: center;
+      padding: 2rem 1rem;
+      max-width: 700px;
+      width: 100%;
+    }
+
+    .title {
+      font-size: 1.2rem;
+      color: #8888aa;
+      margin-bottom: 1.5rem;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+    }
+
+    .number-display {
+      font-size: 8rem;
+      font-weight: 800;
+      line-height: 1;
+      margin-bottom: 0.3rem;
+      transition: color 0.3s ease;
+      font-variant-numeric: tabular-nums;
+      text-shadow: 0 0 40px currentColor;
+      opacity: 0.9;
+    }
+
+    .number-display.small {
+      font-size: 4rem;
+    }
+
+    .label {
+      font-size: 0.85rem;
+      color: #666688;
+      margin-bottom: 1.5rem;
+    }
+
+    .controls {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .controls button {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: #c0c0d0;
+      padding: 0.6rem 1.5rem;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: all 0.2s;
+    }
+
+    .controls button:hover {
+      background: rgba(255, 255, 255, 0.12);
+      border-color: rgba(255, 255, 255, 0.25);
+    }
+
+    .controls button.active {
+      background: rgba(100, 140, 255, 0.15);
+      border-color: rgba(100, 140, 255, 0.4);
+      color: #88aaff;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0.8rem;
+      max-width: 500px;
+      margin: 0 auto 1.5rem;
+    }
+
+    .stat-card {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 10px;
+      padding: 0.8rem 0.5rem;
+    }
+
+    .stat-card .stat-value {
+      font-size: 1.3rem;
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .stat-card .stat-label {
+      font-size: 0.7rem;
+      color: #666688;
+      margin-top: 0.15rem;
+    }
+
+    .range-selector {
+      display: flex;
+      gap: 0.5rem;
+      justify-content: center;
+      margin-bottom: 1rem;
+    }
+
+    .range-selector input {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: #c0c0d0;
+      padding: 0.5rem 0.8rem;
+      border-radius: 6px;
+      width: 80px;
+      text-align: center;
+      font-size: 0.9rem;
+      outline: none;
+    }
+
+    .range-selector input:focus {
+      border-color: rgba(100, 140, 255, 0.5);
+    }
+
+    .range-selector span {
+      display: flex;
+      align-items: center;
+      color: #666688;
+      font-size: 0.85rem;
+    }
+
+    /* --- 分布直方图 --- */
+    .section {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 12px;
+      padding: 1.2rem;
+      margin-bottom: 1.2rem;
+    }
+
+    .section-title {
+      font-size: 0.8rem;
+      color: #555577;
+      letter-spacing: 2px;
+      margin-bottom: 0.8rem;
+      text-align: left;
+    }
+
+    .section-title .note {
+      color: #444466;
+      letter-spacing: 0;
+      font-size: 0.75rem;
+    }
+
+    #histogram {
+      display: flex;
+      align-items: flex-end;
+      gap: 2px;
+      height: 140px;
+      padding: 0 4px;
+    }
+
+    #histogram .bin {
+      flex: 1;
+      border-radius: 2px 2px 0 0;
+      transition: height 0.5s ease, background 0.3s ease;
+      position: relative;
+      min-height: 1px;
+    }
+
+    #histogram .bin:hover {
+      opacity: 0.8;
+    }
+
+    #histogram .bin-label {
+      position: absolute;
+      bottom: -16px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 0.55rem;
+      color: #444466;
+      white-space: nowrap;
+    }
+
+    .histogram-footer {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.6rem;
+      color: #444466;
+      margin-top: 18px;
+      padding: 0 4px;
+    }
+
+    .dist-stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0.5rem;
+      margin-top: 0.8rem;
+    }
+
+    .dist-stat {
+      text-align: center;
+    }
+
+    .dist-stat .ds-value {
+      font-size: 1rem;
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .dist-stat .ds-label {
+      font-size: 0.6rem;
+      color: #555577;
+    }
+
+    /* --- 日志区 --- */
+    .log-container {
+      max-height: 160px;
+      overflow-y: auto;
+      scrollbar-width: thin;
+      scrollbar-color: #333355 transparent;
+      text-align: left;
+      font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+      font-size: 0.75rem;
+      line-height: 1.6;
+    }
+
+    .log-container::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    .log-container::-webkit-scrollbar-thumb {
+      background: #333355;
+      border-radius: 2px;
+    }
+
+    .log-entry {
+      display: flex;
+      gap: 1rem;
+      padding: 1px 0;
+      opacity: 0.7;
+      transition: opacity 0.3s;
+    }
+
+    .log-entry:last-child {
+      opacity: 1;
+    }
+
+    .log-idx {
+      color: #444466;
+      min-width: 3rem;
+      text-align: right;
+    }
+
+    .log-val {
+      font-weight: 600;
+    }
+
+    .top-controls {
+      display: flex;
+      justify-content: flex-end;
+      gap: 0.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .top-controls button {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: #666688;
+      padding: 0.3rem 0.8rem;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 0.75rem;
+      transition: all 0.2s;
+    }
+
+    .top-controls button:hover {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(255, 255, 255, 0.15);
+      color: #8888aa;
+    }
+
+    .back-link {
+      margin: 1.5rem 0 2rem;
+      font-size: 0.8rem;
+    }
+
+    .back-link a {
+      color: #555577;
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .back-link a:hover {
+      color: #8888aa;
+    }
+
+    @media (max-width: 600px) {
+      .number-display {
+        font-size: 5rem;
+      }
+      .number-display.small {
+        font-size: 2.5rem;
+      }
+      .stats {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .dist-stats {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .title {
+        font-size: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <canvas id="particles"></canvas>
+
+  <div class="container">
+    <div class="title">← 随机数生成器 →</div>
+
+    <div class="range-selector">
+      <input type="number" id="minVal" value="0" min="-99999" max="99999">
+      <span>—</span>
+      <input type="number" id="maxVal" value="100" min="-99999" max="99999">
+    </div>
+
+    <div id="numberDisplay" class="number-display">50</div>
+    <div class="label">每秒更新 · 完全随机</div>
+
+    <div class="controls">
+      <button id="typeInt" class="active">整数</button>
+      <button id="typeFloat">小数</button>
+      <button id="toggleBtn">暂停</button>
+    </div>
+
+    <div class="stats">
+      <div class="stat-card">
+        <div class="stat-value" id="statMin">-</div>
+        <div class="stat-label">最小值</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="statMax">-</div>
+        <div class="stat-label">最大值</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="statAvg">-</div>
+        <div class="stat-label">平均值</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="statCount">0</div>
+        <div class="stat-label">生成次数</div>
+      </div>
+    </div>
+
+    <!-- 分布直方图 -->
+    <div class="section">
+      <div class="section-title">
+        分布直方图 <span class="note">— 理想情况下均匀分布，每个区间出现频率应大致相等</span>
+      </div>
+      <div id="histogram"></div>
+      <div class="histogram-footer">
+        <span id="histMin">0</span>
+        <span>区间 ({{binCount}} 组)</span>
+        <span id="histMax">100</span>
+      </div>
+      <div class="dist-stats">
+        <div class="dist-stat">
+          <div class="ds-value" id="dsStddev">-</div>
+          <div class="ds-label">标准差</div>
+        </div>
+        <div class="dist-stat">
+          <div class="ds-value" id="dsVariance">-</div>
+          <div class="ds-label">方差</div>
+        </div>
+        <div class="dist-stat">
+          <div class="ds-value" id="dsExpected">-</div>
+          <div class="ds-label">期望频率</div>
+        </div>
+        <div class="dist-stat">
+          <div class="ds-value" id="dsChi">-</div>
+          <div class="ds-label">卡方值</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 运行日志 -->
+    <div class="section">
+      <div class="section-title">运行日志</div>
+      <div class="top-controls">
+        <button id="clearLogBtn">清空记录</button>
+      </div>
+      <div class="log-container" id="logContainer">
+        <div class="log-entry" style="color:#444466;justify-content:center;opacity:0.5;">
+          等待生成...
+        </div>
+      </div>
+    </div>
+
+    <div class="back-link">
+      <a href="/">← 返回博客首页</a>
+    </div>
+  </div>
+
+  <script>
+    // --- 粒子背景 ---
+    (function() {
+      const canvas = document.getElementById('particles');
+      const ctx = canvas.getContext('2d');
+      let particles = [];
+      let animId;
+
+      function resize() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+      }
+      resize();
+      window.addEventListener('resize', resize);
+
+      for (let i = 0; i < 80; i++) {
+        particles.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height,
+          r: Math.random() * 2 + 0.5,
+          dx: (Math.random() - 0.5) * 0.5,
+          dy: (Math.random() - 0.5) * 0.5,
+          o: Math.random() * 0.5 + 0.1
+        });
+      }
+
+      function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        particles.forEach(p => {
+          p.x += p.dx;
+          p.y += p.dy;
+          if (p.x < 0) p.x = canvas.width;
+          if (p.x > canvas.width) p.x = 0;
+          if (p.y < 0) p.y = canvas.height;
+          if (p.y > canvas.height) p.y = 0;
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(100, 140, 255, ${p.o})`;
+          ctx.fill();
+        });
+
+        for (let i = 0; i < particles.length; i++) {
+          for (let j = i + 1; j < particles.length; j++) {
+            const dx = particles[i].x - particles[j].x;
+            const dy = particles[i].y - particles[j].y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            if (dist < 120) {
+              ctx.beginPath();
+              ctx.moveTo(particles[i].x, particles[i].y);
+              ctx.lineTo(particles[j].x, particles[j].y);
+              ctx.strokeStyle = `rgba(100, 140, 255, ${0.08 * (1 - dist / 120)})`;
+              ctx.lineWidth = 0.5;
+              ctx.stroke();
+            }
+          }
+        }
+
+        animId = requestAnimationFrame(draw);
+      }
+      draw();
+    })();
+
+    // --- 随机数生成器 + 分布分析 ---
+    (function() {
+      const numberDisplay = document.getElementById('numberDisplay');
+      const minInput = document.getElementById('minVal');
+      const maxInput = document.getElementById('maxVal');
+      const typeInt = document.getElementById('typeInt');
+      const typeFloat = document.getElementById('typeFloat');
+      const toggleBtn = document.getElementById('toggleBtn');
+
+      const statMin = document.getElementById('statMin');
+      const statMax = document.getElementById('statMax');
+      const statAvg = document.getElementById('statAvg');
+      const statCount = document.getElementById('statCount');
+
+      const histogram = document.getElementById('histogram');
+      const histMin = document.getElementById('histMin');
+      const histMax = document.getElementById('histMax');
+
+      const dsStddev = document.getElementById('dsStddev');
+      const dsVariance = document.getElementById('dsVariance');
+      const dsExpected = document.getElementById('dsExpected');
+      const dsChi = document.getElementById('dsChi');
+
+      const logContainer = document.getElementById('logContainer');
+      const clearLogBtn = document.getElementById('clearLogBtn');
+
+      let isInt = true;
+      let running = true;
+      let intervalId = null;
+      let allValues = [];
+      let logCount = 0;
+      const BINS = 20;
+      const MAX_LOG = 500;
+
+      function computeHistogram() {
+        if (allValues.length === 0) return;
+
+        const min = parseFloat(minInput.value) || 0;
+        const max = parseFloat(maxInput.value) || 100;
+        const range = max - min || 1;
+
+        const binWidth = range / BINS;
+        const counts = new Array(BINS).fill(0);
+        const binLabels = [];
+
+        for (let i = 0; i < BINS; i++) {
+          const binStart = min + i * binWidth;
+          const binEnd = binStart + binWidth;
+          if (i === 0) {
+            binLabels.push(`${binStart.toFixed(isInt ? 0 : 1)}`);
+          } else if (i === BINS - 1) {
+            binLabels.push(`${binEnd.toFixed(isInt ? 0 : 1)}`);
+          } else {
+            binLabels.push('');
+          }
+        }
+
+        // 整数模式：每个值归入对应区间
+        allValues.forEach(v => {
+          let idx;
+          if (v === max) {
+            idx = BINS - 1;
+          } else {
+            idx = Math.floor((v - min) / binWidth);
+            if (idx >= BINS) idx = BINS - 1;
+            if (idx < 0) idx = 0;
+          }
+          counts[idx]++;
+        });
+
+        const maxCount = Math.max(...counts);
+        const expected = allValues.length / BINS;
+
+        // 卡方检验
+        let chiSq = 0;
+        for (let i = 0; i < BINS; i++) {
+          if (expected > 0) {
+            chiSq += (counts[i] - expected) ** 2 / expected;
+          }
+        }
+
+        // 标准差
+        const avg = allValues.reduce((a, b) => a + b, 0) / allValues.length;
+        const variance = allValues.reduce((sum, v) => sum + (v - avg) ** 2, 0) / allValues.length;
+        const stddev = Math.sqrt(variance);
+
+        // 渲染直方图
+        histogram.innerHTML = '';
+        const barHeightRatio = maxCount > 0 ? 130 / maxCount : 1;
+
+        for (let i = 0; i < BINS; i++) {
+          const bin = document.createElement('div');
+          bin.className = 'bin';
+          const h = Math.max(2, counts[i] * barHeightRatio);
+          bin.style.height = `${h}px`;
+          const hue = 200 + (i / BINS) * 200;
+          const bright = 45 + (counts[i] / Math.max(maxCount, 1)) * 30;
+          bin.style.background = `hsl(${hue}, 60%, ${bright}%)`;
+
+          // 期望线用伪元素实现
+          const expectedH = Math.max(2, expected * barHeightRatio);
+          const ratioColor = counts[i] > 0 ? (counts[i] / expected) : 0;
+          let borderColor;
+          if (ratioColor > 1.3 || ratioColor < 0.7) {
+            borderColor = 'rgba(255,100,100,0.4)';
+          } else {
+            borderColor = 'rgba(100,255,100,0.2)';
+          }
+          bin.style.borderTop = `1px solid ${borderColor}`;
+
+          if (i % 5 === 0 || i === BINS - 1) {
+            const label = document.createElement('div');
+            label.className = 'bin-label';
+            label.textContent = (min + i * binWidth).toFixed(isInt ? 0 : 1);
+            bin.appendChild(label);
+          }
+
+          histogram.appendChild(bin);
+        }
+
+        histMin.textContent = min.toFixed(isInt ? 0 : 1);
+        histMax.textContent = max.toFixed(isInt ? 0 : 1);
+
+        dsStddev.textContent = stddev.toFixed(2);
+        dsVariance.textContent = variance.toFixed(2);
+        dsExpected.textContent = expected.toFixed(1);
+        dsChi.textContent = chiSq.toFixed(2);
+      }
+
+      function addLog(value) {
+        logCount++;
+
+        // 移除"等待生成..."的占位
+        if (logContainer.children.length === 1 && logContainer.children[0].textContent.trim() === '等待生成...') {
+          logContainer.innerHTML = '';
+        }
+
+        const entry = document.createElement('div');
+        entry.className = 'log-entry';
+        entry.innerHTML = `<span class="log-idx">#${logCount}</span><span class="log-val">${value}</span>`;
+        logContainer.appendChild(entry);
+
+        // 保持滚动到底部
+        logContainer.scrollTop = logContainer.scrollHeight;
+
+        // 限制日志数量
+        while (logContainer.children.length > MAX_LOG) {
+          logContainer.removeChild(logContainer.firstChild);
+        }
+      }
+
+      function generate() {
+        let min = parseFloat(minInput.value) || 0;
+        let max = parseFloat(maxInput.value) || 100;
+        if (min > max) { [min, max] = [max, min]; }
+
+        let value;
+        if (isInt) {
+          value = Math.floor(Math.random() * (max - min + 1)) + min;
+        } else {
+          value = Math.random() * (max - min) + min;
+          value = parseFloat(value.toFixed(4));
+        }
+
+        // 更新大数字显示
+        numberDisplay.textContent = value;
+
+        const range = max - min || 1;
+        const ratio = (value - min) / range;
+        const hue = 200 + ratio * 140;
+        numberDisplay.style.color = `hsl(${hue}, 70%, 60%)`;
+
+        const len = String(value).length;
+        if (len > 8) {
+          numberDisplay.style.fontSize = '3rem';
+          numberDisplay.classList.add('small');
+        } else if (len > 5) {
+          numberDisplay.style.fontSize = '5rem';
+          numberDisplay.classList.add('small');
+        } else {
+          numberDisplay.style.fontSize = '';
+          numberDisplay.classList.remove('small');
+        }
+
+        // 更新统计
+        allValues.push(value);
+        const count = allValues.length;
+        const minV = Math.min(...allValues);
+        const maxV = Math.max(...allValues);
+        const avg = allValues.reduce((a, b) => a + b, 0) / count;
+
+        statMin.textContent = isInt ? Math.round(minV) : minV.toFixed(2);
+        statMax.textContent = isInt ? Math.round(maxV) : maxV.toFixed(2);
+        statAvg.textContent = avg.toFixed(4);
+        statCount.textContent = count;
+
+        // 更新分布直方图（每 5 次更新一次，减轻性能开销）
+        if (count % 5 === 0 || count === 1) {
+          computeHistogram();
+        }
+
+        // 更新日志
+        addLog(value);
+      }
+
+      function start() {
+        if (intervalId) clearInterval(intervalId);
+        intervalId = setInterval(generate, 1000);
+        generate();
+      }
+
+      function stop() {
+        if (intervalId) {
+          clearInterval(intervalId);
+          intervalId = null;
+        }
+      }
+
+      function resetAll() {
+        allValues = [];
+        logCount = 0;
+        logContainer.innerHTML = '<div class="log-entry" style="color:#444466;justify-content:center;opacity:0.5;">等待生成...</div>';
+        histogram.innerHTML = '';
+        dsStddev.textContent = '-';
+        dsVariance.textContent = '-';
+        dsExpected.textContent = '-';
+        dsChi.textContent = '-';
+        statMin.textContent = '-';
+        statMax.textContent = '-';
+        statAvg.textContent = '-';
+        statCount.textContent = '0';
+      }
+
+      // 初始化
+      start();
+
+      toggleBtn.addEventListener('click', () => {
+        running = !running;
+        if (running) {
+          start();
+          toggleBtn.textContent = '暂停';
+          toggleBtn.classList.remove('active');
+        } else {
+          stop();
+          toggleBtn.textContent = '继续';
+          toggleBtn.classList.add('active');
+        }
+      });
+
+      typeInt.addEventListener('click', () => {
+        isInt = true;
+        typeInt.classList.add('active');
+        typeFloat.classList.remove('active');
+        resetAll();
+      });
+
+      typeFloat.addEventListener('click', () => {
+        isInt = false;
+        typeFloat.classList.add('active');
+        typeInt.classList.remove('active');
+        resetAll();
+      });
+
+      minInput.addEventListener('change', resetAll);
+      maxInput.addEventListener('change', resetAll);
+
+      clearLogBtn.addEventListener('click', resetAll);
+
+      document.addEventListener('visibilitychange', () => {
+        if (!document.hidden && running && !intervalId) {
+          start();
+        }
+      });
+    })();
+  </script>
+</body>
+</html>

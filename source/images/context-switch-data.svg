@@ -1,0 +1,59 @@
+<svg viewBox="0 0 680 460" width="100%" role="img" xmlns="http://www.w3.org/2000/svg">
+  <title>上下文切换要切换哪些数据 - 进程 vs 线程 vs 协程</title>
+  <desc>三列对比表：进程切换（页表CR3、内核栈、通用寄存器、用户栈、FPU/AVX、TLS段寄存器、调试寄存器）、线程同但页表不切换、协程只有14个寄存器+栈指针</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+  </defs>
+  <text x="340" y="25" text-anchor="middle" dominant-baseline="central" font-size="15" font-weight="500">上下文切换要切换哪些数据</text>
+  <rect x="35" y="50" width="270" height="32" rx="8" fill="#F7C1C1" stroke="#E24B4A" stroke-width="0.5"/>
+  <text x="170" y="66" text-anchor="middle" dominant-baseline="central" font-size="13" font-weight="500" fill="#A32D2D">进程切换</text>
+  <rect x="320" y="50" width="170" height="32" rx="8" fill="#FAEEDA" stroke="#BA7517" stroke-width="0.5"/>
+  <text x="405" y="66" text-anchor="middle" dominant-baseline="central" font-size="13" font-weight="500" fill="#854F0B">线程切换</text>
+  <rect x="505" y="50" width="140" height="32" rx="8" fill="#C0DD97" stroke="#639922" stroke-width="0.5"/>
+  <text x="575" y="66" text-anchor="middle" dominant-baseline="central" font-size="13" font-weight="500" fill="#3B6D11">协程切换</text>
+  <rect x="35" y="100" width="270" height="36" rx="6" fill="#FCEBEB" stroke="#E24B4A" stroke-width="0.5"/>
+  <text x="170" y="118" text-anchor="middle" dominant-baseline="central" font-size="12">页表（CR3）</text>
+  <text x="170" y="130" text-anchor="middle" dominant-baseline="central" font-size="9" fill="#A32D2D">TLB 全清</text>
+  <rect x="320" y="100" width="170" height="36" rx="6" fill="#FAEEDA" stroke="#BA7517" stroke-width="0.5"/>
+  <text x="405" y="118" text-anchor="middle" dominant-baseline="central" font-size="12">x 不切换（同进程）</text>
+  <rect x="505" y="100" width="140" height="36" rx="6" fill="#C0DD97" stroke="#639922" stroke-width="0.5"/>
+  <text x="575" y="118" text-anchor="middle" dominant-baseline="central" font-size="12">x 纯用户态</text>
+  <rect x="35" y="150" width="270" height="36" rx="6" fill="#FCEBEB" stroke="#E24B4A" stroke-width="0.5"/>
+  <text x="170" y="168" text-anchor="middle" dominant-baseline="central" font-size="12">内核栈指针（TSS.RSP0）</text>
+  <rect x="320" y="150" width="170" height="36" rx="6" fill="#FAEEDA" stroke="#BA7517" stroke-width="0.5"/>
+  <text x="405" y="168" text-anchor="middle" dominant-baseline="central" font-size="12">内核栈指针（TSS.RSP0）</text>
+  <rect x="505" y="150" width="140" height="36" rx="6" fill="#C0DD97" stroke="#639922" stroke-width="0.5"/>
+  <text x="575" y="168" text-anchor="middle" dominant-baseline="central" font-size="12">x</text>
+  <rect x="35" y="200" width="270" height="36" rx="6" fill="#FCEBEB" stroke="#E24B4A" stroke-width="0.5"/>
+  <text x="170" y="218" text-anchor="middle" dominant-baseline="central" font-size="12">通用寄存器（RBX, RBP, R12-15 等）</text>
+  <rect x="320" y="200" width="170" height="36" rx="6" fill="#FAEEDA" stroke="#BA7517" stroke-width="0.5"/>
+  <text x="405" y="218" text-anchor="middle" dominant-baseline="central" font-size="12">通用寄存器</text>
+  <rect x="505" y="200" width="140" height="36" rx="6" fill="#C0DD97" stroke="#639922" stroke-width="0.5"/>
+  <text x="575" y="218" text-anchor="middle" dominant-baseline="central" font-size="12">14 个寄存器</text>
+  <rect x="35" y="250" width="270" height="36" rx="6" fill="#FCEBEB" stroke="#E24B4A" stroke-width="0.5"/>
+  <text x="170" y="268" text-anchor="middle" dominant-baseline="central" font-size="12">用户栈指针</text>
+  <rect x="320" y="250" width="170" height="36" rx="6" fill="#FAEEDA" stroke="#BA7517" stroke-width="0.5"/>
+  <text x="405" y="268" text-anchor="middle" dominant-baseline="central" font-size="12">用户栈指针</text>
+  <rect x="505" y="250" width="140" height="36" rx="6" fill="#C0DD97" stroke="#639922" stroke-width="0.5"/>
+  <text x="575" y="268" text-anchor="middle" dominant-baseline="central" font-size="12">栈指针（切换栈）</text>
+  <rect x="35" y="300" width="270" height="36" rx="6" fill="#FCEBEB" stroke="#E24B4A" stroke-width="0.5"/>
+  <text x="170" y="318" text-anchor="middle" dominant-baseline="central" font-size="12">FPU/AVX 状态（可选懒切换）</text>
+  <rect x="320" y="300" width="170" height="36" rx="6" fill="#FAEEDA" stroke="#BA7517" stroke-width="0.5"/>
+  <text x="405" y="318" text-anchor="middle" dominant-baseline="central" font-size="12">FPU/AVX 状态</text>
+  <rect x="505" y="300" width="140" height="36" rx="6" fill="#C0DD97" stroke="#639922" stroke-width="0.5"/>
+  <text x="575" y="318" text-anchor="middle" dominant-baseline="central" font-size="12">x</text>
+  <rect x="35" y="350" width="270" height="36" rx="6" fill="#FCEBEB" stroke="#E24B4A" stroke-width="0.5"/>
+  <text x="170" y="368" text-anchor="middle" dominant-baseline="central" font-size="12">TLS 段寄存器（FS/GS base）</text>
+  <rect x="320" y="350" width="170" height="36" rx="6" fill="#FAEEDA" stroke="#BA7517" stroke-width="0.5"/>
+  <text x="405" y="368" text-anchor="middle" dominant-baseline="central" font-size="12">TLS 段寄存器（FS/GS base）</text>
+  <rect x="505" y="350" width="140" height="36" rx="6" fill="#C0DD97" stroke="#639922" stroke-width="0.5"/>
+  <text x="575" y="368" text-anchor="middle" dominant-baseline="central" font-size="12">x</text>
+  <rect x="35" y="400" width="270" height="36" rx="6" fill="#FCEBEB" stroke="#E24B4A" stroke-width="0.5"/>
+  <text x="170" y="418" text-anchor="middle" dominant-baseline="central" font-size="12">调试寄存器（DR0-DR7）</text>
+  <rect x="320" y="400" width="170" height="36" rx="6" fill="#FAEEDA" stroke="#BA7517" stroke-width="0.5"/>
+  <text x="405" y="418" text-anchor="middle" dominant-baseline="central" font-size="12">调试寄存器</text>
+  <rect x="505" y="400" width="140" height="36" rx="6" fill="#C0DD97" stroke="#639922" stroke-width="0.5"/>
+  <text x="575" y="418" text-anchor="middle" dominant-baseline="central" font-size="12">x</text>
+</svg>

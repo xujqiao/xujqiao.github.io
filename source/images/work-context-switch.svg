@@ -1,0 +1,49 @@
+<svg viewBox="0 0 680 340" width="100%" role="img" xmlns="http://www.w3.org/2000/svg">
+  <title>人 vs 计算机的上下文切换层级类比</title>
+  <desc>左侧计算机：进程（最重）→ 线程（中等）→ 协程（最轻）。右侧工作：紧急打断 → 日常多任务 → 深度专注，切换成本逐级递减</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+  </defs>
+  <text x="340" y="25" text-anchor="middle" dominant-baseline="central" font-size="15" font-weight="500">工作中的上下文切换层级</text>
+  <!-- Left column: computer -->
+  <rect x="40" y="55" width="280" height="270" rx="12" fill="#F1EFE8" stroke="#5F5E5A" stroke-width="0.5"/>
+  <text x="180" y="78" text-anchor="middle" dominant-baseline="central" font-size="13" font-weight="500">计算机的层级</text>
+  <!-- Process -->
+  <rect x="60" y="100" width="240" height="44" rx="8" fill="#FCEBEB" stroke="#E24B4A" stroke-width="0.5"/>
+  <text x="180" y="118" text-anchor="middle" dominant-baseline="central" font-size="12">进程切换：页表 + TLB flush + 寄存器</text>
+  <text x="180" y="134" text-anchor="middle" dominant-baseline="central" font-size="10" fill="#A32D2D">切换成本最高</text>
+  <!-- Arrow -->
+  <line x1="180" y1="144" x2="180" y2="160" stroke="#5F5E5A" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <!-- Thread -->
+  <rect x="60" y="165" width="240" height="44" rx="8" fill="#FAEEDA" stroke="#BA7517" stroke-width="0.5"/>
+  <text x="180" y="183" text-anchor="middle" dominant-baseline="central" font-size="12">线程切换：寄存器 + 栈（少页表）</text>
+  <text x="180" y="199" text-anchor="middle" dominant-baseline="central" font-size="10" fill="#854F0B">切换成本中等</text>
+  <!-- Arrow -->
+  <line x1="180" y1="209" x2="180" y2="225" stroke="#5F5E5A" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <!-- Coroutine -->
+  <rect x="60" y="230" width="240" height="44" rx="8" fill="#C0DD97" stroke="#639922" stroke-width="0.5"/>
+  <text x="180" y="248" text-anchor="middle" dominant-baseline="central" font-size="12">协程切换：14 个寄存器 + 栈指针</text>
+  <text x="180" y="264" text-anchor="middle" dominant-baseline="central" font-size="10" fill="#3B6D11">切换成本最低</text>
+  <!-- Right column: work -->
+  <rect x="360" y="55" width="280" height="270" rx="12" fill="#F1EFE8" stroke="#5F5E5A" stroke-width="0.5"/>
+  <text x="500" y="78" text-anchor="middle" dominant-baseline="central" font-size="13" font-weight="500">工作的映射</text>
+  <!-- High: emergency -->
+  <rect x="380" y="100" width="240" height="44" rx="8" fill="#FCEBEB" stroke="#E24B4A" stroke-width="0.5"/>
+  <text x="500" y="118" text-anchor="middle" dominant-baseline="central" font-size="12">紧急打断：线上故障、被拉去救火</text>
+  <text x="500" y="134" text-anchor="middle" dominant-baseline="central" font-size="10" fill="#A32D2D">回来要很久才能重新进入状态</text>
+  <line x1="500" y1="144" x2="500" y2="160" stroke="#5F5E5A" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <!-- Medium -->
+  <rect x="380" y="165" width="240" height="44" rx="8" fill="#FAEEDA" stroke="#BA7517" stroke-width="0.5"/>
+  <text x="500" y="183" text-anchor="middle" dominant-baseline="central" font-size="12">日常多任务：回消息、看文档、开会</text>
+  <text x="500" y="199" text-anchor="middle" dominant-baseline="central" font-size="10" fill="#854F0B">频繁切换但每个任务都不太重</text>
+  <line x1="500" y1="209" x2="500" y2="225" stroke="#5F5E5A" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <!-- Low -->
+  <rect x="380" y="230" width="240" height="44" rx="8" fill="#C0DD97" stroke="#639922" stroke-width="0.5"/>
+  <text x="500" y="248" text-anchor="middle" dominant-baseline="central" font-size="12">深度专注：写代码、写方案</text>
+  <text x="500" y="264" text-anchor="middle" dominant-baseline="central" font-size="10" fill="#3B6D11">切换成本最低，产出质量最高</text>
+  <!-- Bridge arrow -->
+  <line x1="320" y1="190" x2="356" y2="190" stroke="#534AB7" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="338" y="182" text-anchor="middle" dominant-baseline="central" font-size="10" fill="#534AB7">类比</text>
+</svg>

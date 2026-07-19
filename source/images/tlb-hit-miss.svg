@@ -1,0 +1,57 @@
+<svg viewBox="0 0 680 470" width="100%" role="img" xmlns="http://www.w3.org/2000/svg">
+  <title>TLB 命中 vs TLB 未命中 - 内存访问流程</title>
+  <desc>左右对比：TLB命中时1-2周期直达物理内存，TLB未命中时需page walk遍历四级页表，耗时10-100+周期</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+  </defs>
+  <text x="340" y="25" text-anchor="middle" dominant-baseline="central" font-size="15" font-weight="500">一次内存访问：TLB 命中 vs TLB 未命中</text>
+  <rect x="35" y="50" width="290" height="400" rx="16" fill="#EAF3DE" stroke="#639922" stroke-width="0.5"/>
+  <rect x="55" y="65" width="250" height="32" rx="8" fill="#97C459" stroke="#639922" stroke-width="0.5"/>
+  <text x="180" y="81" text-anchor="middle" dominant-baseline="central" font-size="13" font-weight="500" fill="#173404">TLB 命中（快路径）</text>
+  <rect x="55" y="115" width="250" height="44" rx="8" fill="#EAF3DE" stroke="#639922" stroke-width="0.5"/>
+  <text x="180" y="133" text-anchor="middle" dominant-baseline="central" font-size="12">CPU 发出虚拟地址 0x4000</text>
+  <text x="180" y="150" text-anchor="middle" dominant-baseline="central" font-size="11" fill="#3B6D11">存入内存中的数据</text>
+  <line x1="180" y1="159" x2="180" y2="178" stroke="#639922" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <rect x="55" y="183" width="250" height="44" rx="8" fill="#C0DD97" stroke="#3B6D11" stroke-width="0.5"/>
+  <text x="180" y="201" text-anchor="middle" dominant-baseline="central" font-size="12">查找 TLB</text>
+  <text x="180" y="218" text-anchor="middle" dominant-baseline="central" font-size="11" fill="#27500A">命中！找到映射：0x4000 → 0x3a00</text>
+  <line x1="180" y1="227" x2="180" y2="246" stroke="#3B6D11" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <rect x="55" y="251" width="250" height="44" rx="8" fill="#EAF3DE" stroke="#639922" stroke-width="0.5"/>
+  <text x="180" y="269" text-anchor="middle" dominant-baseline="central" font-size="12">直接获取物理地址 0x3a00</text>
+  <text x="180" y="286" text-anchor="middle" dominant-baseline="central" font-size="11" fill="#3B6D11">无需查页表</text>
+  <line x1="180" y1="295" x2="180" y2="314" stroke="#639922" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <rect x="55" y="319" width="250" height="44" rx="8" fill="#97C459" stroke="#3B6D11" stroke-width="0.5"/>
+  <text x="180" y="337" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#173404">访问物理内存，读取数据</text>
+  <text x="180" y="354" text-anchor="middle" dominant-baseline="central" font-size="11" fill="#27500A">完成！</text>
+  <rect x="55" y="380" width="250" height="28" rx="6" fill="#C0DD97" stroke="#3B6D11" stroke-width="0.5"/>
+  <text x="180" y="394" text-anchor="middle" dominant-baseline="central" font-size="11" fill="#27500A">耗时：约 1-2 个 CPU 周期</text>
+  <rect x="355" y="50" width="290" height="400" rx="16" fill="#FCEBEB" stroke="#E24B4A" stroke-width="0.5"/>
+  <rect x="375" y="65" width="250" height="32" rx="8" fill="#F09595" stroke="#E24B4A" stroke-width="0.5"/>
+  <text x="500" y="81" text-anchor="middle" dominant-baseline="central" font-size="13" font-weight="500" fill="#501313">TLB 未命中（慢路径）</text>
+  <rect x="375" y="115" width="250" height="44" rx="8" fill="#FCEBEB" stroke="#E24B4A" stroke-width="0.5"/>
+  <text x="500" y="133" text-anchor="middle" dominant-baseline="central" font-size="12">CPU 发出虚拟地址 0x1000</text>
+  <text x="500" y="150" text-anchor="middle" dominant-baseline="central" font-size="11" fill="#A32D2D">首次访问，TLB 中没有记录</text>
+  <line x1="500" y1="159" x2="500" y2="178" stroke="#E24B4A" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <rect x="375" y="183" width="250" height="44" rx="8" fill="#F7C1C1" stroke="#A32D2D" stroke-width="0.5"/>
+  <text x="500" y="201" text-anchor="middle" dominant-baseline="central" font-size="12">查找 TLB</text>
+  <text x="500" y="218" text-anchor="middle" dominant-baseline="central" font-size="11" fill="#791F1F">未命中！TLB 中没有 0x1000</text>
+  <line x1="500" y1="227" x2="500" y2="246" stroke="#A32D2D" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <rect x="375" y="251" width="250" height="56" rx="8" fill="#FCEBEB" stroke="#E24B4A" stroke-width="0.5"/>
+  <text x="500" y="269" text-anchor="middle" dominant-baseline="central" font-size="12">硬件 page walk</text>
+  <text x="500" y="286" text-anchor="middle" dominant-baseline="central" font-size="11" fill="#A32D2D">查四级页表（L4→L3→L2→L1）</text>
+  <text x="500" y="300" text-anchor="middle" dominant-baseline="central" font-size="11" fill="#A32D2D">最终找到 0x1000 → 0x0500</text>
+  <line x1="500" y1="307" x2="500" y2="320" stroke="#E24B4A" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <rect x="375" y="325" width="250" height="36" rx="8" fill="#F7C1C1" stroke="#A32D2D" stroke-width="0.5"/>
+  <text x="500" y="343" text-anchor="middle" dominant-baseline="central" font-size="12">将映射写入 TLB 缓存</text>
+  <line x1="500" y1="361" x2="500" y2="366" stroke="#A32D2D" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <rect x="375" y="370" width="250" height="36" rx="8" fill="#F09595" stroke="#A32D2D" stroke-width="0.5"/>
+  <text x="500" y="388" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#501313">最终访问物理地址 0x0500</text>
+  <rect x="375" y="380" width="250" height="28" rx="6" fill="#F7C1C1" stroke="#A32D2D" stroke-width="0.5"/>
+  <text x="500" y="394" text-anchor="middle" dominant-baseline="central" font-size="11" fill="#791F1F">耗时：约 10-100+ 个 CPU 周期</text>
+  <rect x="55" y="420" width="250" height="24" rx="6" fill="#C0DD97" stroke="#639922" stroke-width="0.5"/>
+  <text x="180" y="432" text-anchor="middle" dominant-baseline="central" font-size="11" fill="#3B6D11">切换页表后 TLB 全清，新进程前几百次访问全走慢路径</text>
+  <rect x="375" y="420" width="250" height="24" rx="6" fill="#FCEBEB" stroke="#E24B4A" stroke-width="0.5"/>
+  <text x="500" y="432" text-anchor="middle" dominant-baseline="central" font-size="11" fill="#791F1F">同进程线程切换 CR3 不变，TLB 不动，继续命中</text>
+</svg>

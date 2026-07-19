@@ -28,8 +28,6 @@ categories: 随笔
 
 三条状态分别代表饱食度、快乐度和精力，会随时间慢慢下降。要是太久不理它，它会自己睡着。
 
-完整沉浸版在[这里](/pixel-pet/)。
-
 <style>
 .pet-embed { box-sizing:border-box; }
 @media (max-width:480px){
